@@ -8,17 +8,31 @@ const PORT: number = Number(process.env.PORT) || 3000;
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
 io.on('connection', (socket: Socket) => {
   console.log('socket', socket);
   console.log('connnected');
-
-  io.on('chat', payload => {
-    console.log('What is payload ', payload);
-    io.emit('chat', payload);
-  });
 });
+
+io.emit('chat', [
+  {
+    ticker: {
+      base: 'usdt',
+      target: 'usdt',
+      price: 1234,
+      volume: 1234,
+      change: 1234,
+    },
+    timestamp: 1234,
+    success: true,
+    error: '',
+  },
+]);
 
 server.listen(PORT, () => {
   console.log(`Server is up on port ${PORT}!`);
