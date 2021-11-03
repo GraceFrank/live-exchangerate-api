@@ -1,24 +1,25 @@
-console.log('Try npm run lint/fix!');
+import * as dotenv from 'dotenv';
+import * as http from 'http';
+import * as express from 'express';
+import {Server, Socket} from 'socket.io';
+dotenv.config();
 
-const longString =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut aliquet diam.';
+const PORT: number = Number(process.env.PORT) || 3000;
 
-const trailing = 'Semicolon';
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-const why = 'am I tabbed?';
+io.on('connection', (socket: Socket) => {
+  console.log('socket', socket);
+  console.log('connnected');
 
-export function doSomeStuff(
-  withThis: string,
-  andThat: string,
-  andThose: string[]
-) {
-  //function on one line
-  if (!andThose.length) {
-    return false;
-  }
-  console.log(withThis);
-  console.log(andThat);
-  console.dir(andThose);
-  return;
-}
-// TODO: more examples
+  io.on('chat', payload => {
+    console.log('What is payload ', payload);
+    io.emit('chat', payload);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server is up on port ${PORT}!`);
+});
