@@ -29,6 +29,7 @@ async function callAPIandEmitExchangeRate() {
       getExchangeRate('doge', 'usd'),
     ]);
     io.emit('exchangeRateUpdate', exchangeRates);
+    console.log(exchangeRates);
   } catch (err) {
     console.log('ERROR', err);
   }

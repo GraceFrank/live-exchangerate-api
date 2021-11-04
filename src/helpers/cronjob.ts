@@ -4,7 +4,7 @@ export default class CronJobFactory {
   job: CronJob;
 
   constructor(job: () => void) {
-    this.job = new CronJob('*/15 * * * * *', job);
+    this.job = new CronJob('*/3 * * * * *', job);
   }
 
   start() {
