@@ -1,14 +1,13 @@
 "use strict";
-// import cron from 'cron';
-// const CronJob = cron.CronJob;
-// const job = new CronJob(
-//   '*/1 * * * * *',
-//   () => {
-//     console.log('You will see this message every second');
-//   },
-//   null,
-//   true,
-//   'America/Los_Angeles'
-// );
-// job.start();
+Object.defineProperty(exports, "__esModule", { value: true });
+const cron_1 = require("cron");
+class CronJobFactory {
+    constructor(job) {
+        this.job = new cron_1.CronJob('*/10 * * * *', job);
+    }
+    start() {
+        this.job.start();
+    }
+}
+exports.default = CronJobFactory;
 //# sourceMappingURL=cronjob.js.map

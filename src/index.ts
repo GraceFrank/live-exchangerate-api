@@ -1,8 +1,9 @@
-import * as dotenv from 'dotenv';
 import * as http from 'http';
 import * as express from 'express';
 import {Server, Socket} from 'socket.io';
-dotenv.config();
+import Exchange_Rate from './types/ExchangeRate';
+import {getExchangeRate} from './helpers/api';
+import CronJob from './helpers/cronjob';
 
 const PORT: number = Number(process.env.PORT) || 3000;
 
@@ -14,25 +15,30 @@ const io = new Server(server, {
   },
 });
 
-io.on('connection', (socket: Socket) => {
-  console.log('socket', socket);
-  console.log('connnected');
-});
+async function callAPIandEmitExchangeRate() {
+  try {
+    console.log('-------Starting New Cycle--------');
+    const exchangeRates: Exchange_Rate[] = await Promise.all([
+      getExchangeRate('btc', 'usd'),
+      getExchangeRate('eth', 'usd'),
+      getExchangeRate('dot', 'usd'),
+      getExchangeRate('ada', 'usd'),
+      getExchangeRate('bnb', 'usd'),
+      getExchangeRate('btt', 'usd'),
+      getExchangeRate('dash', 'usd'),
+      getExchangeRate('doge', 'usd'),
+    ]);
+    io.emit('exchangeRateUpdate', exchangeRates);
+  } catch (err) {
+    console.log('ERROR', err);
+  }
+}
 
-io.emit('chat', [
-  {
-    ticker: {
-      base: 'usdt',
-      target: 'usdt',
-      price: 1234,
-      volume: 1234,
-      change: 1234,
-    },
-    timestamp: 1234,
-    success: true,
-    error: '',
-  },
-]);
+io.on('connection', (socket: Socket) => {
+  console.log('Socket connnected');
+  const cronJob = new CronJob(callAPIandEmitExchangeRate);
+  cronJob.start();
+});
 
 server.listen(PORT, () => {
   console.log(`Server is up on port ${PORT}!`);
